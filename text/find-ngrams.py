@@ -10,6 +10,8 @@ Usage:
 Output: JSON files saved in the "clusters" directory, each containing file paths for the corresponding n-gram.
 
 Dependencies: nltk, tqdm, unidecode
+
+Note: ensure that <path_to_directory> is a full path, not a relative path.
 """
 
 import os
