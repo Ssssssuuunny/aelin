@@ -1,9 +1,11 @@
 #!/bin/bash
 # find-corrupted-multithreaded.sh
 # Description: checks all jpg images in the given directory and its subdirectories for corruption using multiple threads
-# Usage: ./find-corrupted-multithreaded.sh /PATH/TO/IMAGES NUM_THREADS [OUTPUT_FILE]
+# Usage: ./find-corrupted-multithreaded.sh /PATH/TO/IMAGES NUM_THREADS [OUTPUT_FILE] [CORRUPTED_ONLY_FILE]
 # Warning: all input paths are considered to be without special characters like spaces. This script is provided as is and won't work with paths with special characters.
-# Expected output: a summary file listing check results, by default named corrupted_jpgs_summary.txt in the input directory. Use the optional [OUTPUT_FILE] argument to specify a different output file.
+# Expected output: a summary file listing check results, by default named corrupted_jpgs_summary.txt in the input directory. 
+#                  Use [OUTPUT_FILE] to specify a different output file. 
+#                  Use [CORRUPTED_ONLY_FILE] to save only corrupted files list.
 # Dependencies: ImageMagick, find-corrupted-jpg.sh
 
 input_dir="$1"
@@ -35,3 +37,10 @@ for dir in $dirs; do
         echo -e "\n" >> "$output_file"
     fi
 done
+
+# if corrupted-only file is specified, extract only corrupted images
+corrupted_only_file="${4:-}"
+if [ -n "$corrupted_only_file" ]; then
+    grep " 1$" "$output_file" | cut -d " " -f 1 > "$corrupted_only_file"
+    echo "Corrupted images saved to: $corrupted_only_file" >&2
+fi
