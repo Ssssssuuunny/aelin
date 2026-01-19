@@ -77,7 +77,7 @@ This contains two tools for image conversion purposes, both dependent on ImageMa
 ### convert-jp2-to-jpeg.sh
 
 #### Description
-This tool converts all jp2 files in a given directory to jpeg using multiple threads (default 16).
+This tool converts all jp2 files in a given directory to jpeg using multiple threads (default 16), skipping the already converted ones
 
 #### Usage
 ```bash
@@ -102,7 +102,7 @@ And `user/jp2_images/image1.jp2.jpeg` and `user/jp2_images/subfolder/image2.jp2.
 ### create-image-cache.sh
 
 #### Description
-This tool creates thumbnails for each jp2 file in a given directory, resizing it to 1000x1000 pixels, stripping metadata, using place interlacing to create progressive jpegs, applying slight blur, and compressing it to a reasonable size with a high quality.
+This tool creates thumbnails for each jp2 file in a given directory using multiple threads (default 4), resizing it to 1000x1000 pixels, stripping metadata, using place interlacing to create progressive jpegs, applying slight blur, and compressing it to a reasonable size with a high quality. Those that have had a corresponding thumbnail will be skipped.
 
 #### Usage 
 ```bash
@@ -115,19 +115,19 @@ Thumbnails corresponding with each jp2 saved in the output directory following t
 #### Example
 If you run the following command:
 ```bash
-./convert-jp2-to-jpeg.sh /user/jp2_images/ /user/jp2_images_cache/
+./create-image-cache.sh /user/jp2_images/ /user/cache/
 ```
 The standard ouput will be as below:
 ``` bash
 Thumbnail to be created for: /user/jp2_images/image1.jp2
 Thumbnail to be created for: /user/jp2_images/subfolder/image2.jp2
 ```
-And a new folder `/user/jp2_images_cache/user/jp2_images` will be created with the following structure and content:
+And a new folder `/user/cache/user/jp2_images/` will be created with the following structure and content:
 ```text
-/user/jp2_images_cache/user/jp2_images/
-├── image1.jp2.jpeg
+/user/cache/user/jp2_images/
+├── image1.jp2.thumbnail.jpg
 └── subfolder
-    └──image2.jp2.jpeg
+    └── image2.jp2.thumbnail.jpg
 
 ```
 
