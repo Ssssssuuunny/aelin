@@ -116,13 +116,21 @@ def find_ngrams(directory, prefix, excluded_files, n=5, top_k=1000, limit=500000
     """Find the most common n-grams in text files within a directory."""
     if exclude_words is None:
         exclude_words = set()
+    if exclude_words_insensitive is None:
+        exclude_words_insensitive = set()
     if required_words is None:
         required_words = set()
-    for word in exclude_words:
-        print(f"Excluding word: {word}")
-    for word in required_words:
-        print(f"Required word: {word}")
+    if required_words_insensitive is None:
+        required_words_insensitive = set()
 
+    for word in exclude_words:
+        print(f"Excluding word (case sensitive): {word}")
+    for word in exclude_words_insensitive:
+        print(f"Excluding word (case insensitive): {word}")
+    for word in required_words:
+        print(f"Required word (case sensitive): {word}")
+    for word in required_words_insensitive:
+        print(f"Required word (case insensitive): {word}")
 
     ngram_counter = Counter()
     ngram_files = {}
@@ -298,6 +306,7 @@ if __name__ == '__main__':
     parser.add_argument('--prefix_output', type=str, default=None, help='Prefix the output files with this string')
     parser.add_argument('--predictions_dir', type=str, default=None, help='Directory containing predictions JSON files')
     parser.add_argument('--input_file_prefix', type=str, default=None, help='Only process files starting with this prefix')
+    parser.add_argument('--ngrams_memory_limit', type=int, default=100000, help='Limit the number of n-grams to keep in memory (default: 100000)')
 
     args = parser.parse_args()
 
@@ -309,6 +318,7 @@ if __name__ == '__main__':
         args.directory,
         args.input_file_prefix,
         excluded_files,
+        limit_ngrams=args.ngrams_memory_limit,
         n=args.n,
         top_k=args.top_k * 100,
         limit=args.limit,
