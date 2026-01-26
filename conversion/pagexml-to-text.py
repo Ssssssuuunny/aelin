@@ -1,3 +1,18 @@
+"""
+pagexml-to-text.py
+
+Convert PageXML files to plain text, merging consecutive lines within each TextRegion with spaces,
+unless customizable options are specified.
+
+Usage:
+    python pagexml-to-text.py --input_dir <input_directory> --output_dir <output_directory> [options]
+    python pagexml-to-text.py --help  # for all parameters
+
+Output: plain text files in the output directory, one per PageXML file.
+
+Dependencies: xml.etree.ElementTree, os, argparse, tqdm
+"""
+
 import xml.etree.ElementTree as ET
 import os
 import argparse
@@ -10,13 +25,8 @@ import tqdm
 def read_pagexml_file(file_path, separate_single_words, merge_dashes, split_periods, merge_quotes, separate_colons):
     """
     Parse PageXML file and extract text from PlainText elements.
-    Apply text merging rules:
-    1. Each TextRegion is processed separately
-    2. Single-word lines remain separate entries, typical for headings and question forms.
-    3. Lines ending with period before capital characters remain separate
-    4. Hyphenated words at line breaks are joined
-    5. Lines starting/ending with quotes are merged, typical for early modern handwritten text
-    6. Otherwise, consecutive lines are merged with spaces
+    Each TextRegion is processed separately.
+    Consecutive lines are merged with spaces unless merging options are specified.
     """
     try:
         # Register the namespace
@@ -79,7 +89,7 @@ def read_pagexml_file(file_path, separate_single_words, merge_dashes, split_peri
                 if not current:
                     continue
 
-                # Rule 1: If line is a single word, it's separate
+                # Option 1: separate single-word lines
                 if separate_single_words and len(current.split()) == 1:
                     # if both lines have similar x coordinate, merge them
                     # TODO
@@ -97,18 +107,18 @@ def read_pagexml_file(file_path, separate_single_words, merge_dashes, split_peri
                         i += 1
                         continue
 
-                    # Rule 2: If current ends with period and next starts with capital,
-                    # don't merge them
+                    # Option 2: separate lines ending with period before capital characters
                     if split_periods and current.endswith('.') and next_line and next_line[0].isupper():
                         break
 
-                    # Rule 3: If next line is single word, don't merge with it
+                    # Option 1 continued: if next line is single word, stop merging and keep it separate
                     if separate_single_words and len(next_line.split()) == 1:
                         break
 
-                    # Rule 4: Handle hyphenation
+                    # Option 3: merge hyphenated words at line breaks
                     if merge_dashes and current.endswith('-') :
                         current = current[:-1] + next_line
+                    # Option 4: keep lines ending with colons separate
                     elif separate_colons and current.endswith(':'):
                         break
                     else:
@@ -141,12 +151,12 @@ def main(input_dir, output_dir, separate_single_words, merge_dashes, split_perio
     print(f"Processed {len(pagexml_files)} files. Output written to {output_dir}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Convert PageXML files to plain text with merging rules.")
+    parser = argparse.ArgumentParser(description="Convert PageXML files to plain text with merging options.")
     parser.add_argument('--input_dir', required=True, help="Directory containing PageXML files")
     parser.add_argument('--output_dir', required=True, help="Directory to save output text files")
-    parser.add_argument('--merge_dashes', action='store_true', help="Enable merging of hyphenated words at line breaks")
-    parser.add_argument('--split_periods', action='store_true', help="Enable splitting lines ending with periods before capital letters. This should result in each text line being a full sentence. If disabled, there should be a full paragraph per outputted text line.")
-    parser.add_argument('--merge_quotes', action='store_true', help="Enable merging lines starting/ending with quotes, typical for early modern handwritten text")
+    parser.add_argument('--merge_dashes', action='store_true', help="Merge hyphenated words at line breaks")
+    parser.add_argument('--split_periods', action='store_true', help="Split lines ending with periods before capital letters. This should result in each text line being a full sentence. If disabled, there should be a full paragraph per outputted text line.")
+    parser.add_argument('--merge_quotes', action='store_true', help="Merge lines starting/ending with quotes, typical for early modern handwritten text. This option is not implemented yet.")
     parser.add_argument('--separate_single_words', action='store_true', help="Keep single-word lines separate, typical for headings and question forms")
     parser.add_argument('--separate_colons', action='store_true', help="Keep lines ending with colon separate, typical for lists and definitions")
 
