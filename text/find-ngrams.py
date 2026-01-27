@@ -5,7 +5,7 @@ Find the most common n-grams in text files within a specified directory.
 
 Usage: 
     python find-ngrams.py --directory <path_to_directory>
-    python find-ngrams.py --help  # for all paramters
+    python find-ngrams.py --help  # for all parameters
 
 Output: JSON files saved in the "clusters" directory, each containing file paths for the corresponding n-gram.
 
